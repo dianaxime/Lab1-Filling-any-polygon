@@ -164,37 +164,17 @@ class Render(object):
                 threshold += 2 * dx
 
 
-    def prueba(self):
-        print(self.puntos)
-        '''for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                self.line(x, y, x2, y2)
-
-        for y in range(y0, y2 + 1):
-            for x in range(x0, x2 + 1):
-                self.line(x, y, x1, y1)
-
-        for y in range(y2, y1 + 1):
-            for x in range(x2, x1 + 1):
-                self.line(x, y, x0, y0)'''
+    def prueba(self, vertex):
+        i = 0
+        while i <= (len(vertex) - 2):
+            self.line(vertex[i][0], vertex[i][1], vertex[i+1][0], vertex[i+1][1])
+            i += 1
+        self.line(vertex[i][0], vertex[i][1], vertex[0][0], vertex[0][1])
         
-        '''for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                self.line(y2, x2, y, x)'''
-
-        '''for y in range(y0, y2 + 1):
-            for x in range(x0, x2 + 1):
-                self.line(y1, x1, y, x)
-
-        for y in range(y2, y1 + 1):
-            for x in range(x2, x1 + 1):
-                self.line(y0, x0, y, x)'''
-
         for j in self.puntos:
             mi = min(self.puntos.get(j))
             ma = max(self.puntos.get(j))
             for i in range(mi, ma):
-                #print(i, j)
                 self.point(i, j)
 
     def glFinish(self, filename='out.bmp'):
@@ -228,56 +208,9 @@ class Render(object):
 
 
 bitmap = Render()
-
 bitmap.glCreateWindow(500, 500)
 bitmap.glClearColor(0.45, 0.06, 0.87)
-#bitmap.glViewport(25, 25, 400, 300)
-#bitmap.glColor(1, 0.28, 0)
-#bitmap.glPoint(-0.5, 1)
 bitmap.glColor(0.2, 0.70, 0.36)
-
-# aca abajo prueba
-#bitmap.prueba(180, 330, 207, 345, 233, 330)
-'''
-PINTA AFUERA
-bitmap.prueba(205, 410, 193, 383, 165, 380)
-bitmap.prueba(233, 330, 230, 360, 250, 380)
-bitmap.prueba(180, 330, 207, 345, 233, 330)
-bitmap.prueba(165, 380, 185, 360, 180, 330)
-'''
-'''
-PINTA DENTRO
-bitmap.prueba(207, 345, 233, 330, 230, 360)
-'''
-
-'''
-NO SIRVEN
-bitmap.prueba(185, 360, 180, 330, 180, 330)
-bitmap.prueba(250, 380, 220, 385, 205, 410)
-'''
-
-# Aca nueva idea
-bitmap.line(165, 380, 185, 360)
-bitmap.line(185, 360, 180, 330)
-bitmap.line(180, 330, 207, 345)
-#bitmap.prueba()
-#bitmap.puntos = {}
-bitmap.line(207, 345, 233, 330)
-bitmap.line(233, 330, 230, 360)
-bitmap.line(230, 360, 250, 380)
-#bitmap.prueba()
-#bitmap.puntos = {}
-bitmap.line(250, 380, 220, 385)
-bitmap.line(220, 385, 205, 410)
-bitmap.line(205, 410, 193, 383)
-#bitmap.prueba()
-#bitmap.puntos = {}
-bitmap.line(193, 383, 165, 380)
-bitmap.prueba()
-# linea diagonal
-#bitmap.glLine(-0.75, -1, 0.25, 1)
-# linea horizontal
-#bitmap.glLine(0.25, -1, 0.25, 1)
-# linea vertical
-#bitmap.glLine(-0.75, -1, 0.25, -1)
+vertex = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330), (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
+bitmap.prueba(vertex)
 bitmap.glFinish()
