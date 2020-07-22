@@ -165,18 +165,22 @@ class Render(object):
 
 
     def prueba(self, vertex):
+        self.puntos = {}
         i = 0
         while i <= (len(vertex) - 2):
             self.line(vertex[i][0], vertex[i][1], vertex[i+1][0], vertex[i+1][1])
             i += 1
         self.line(vertex[i][0], vertex[i][1], vertex[0][0], vertex[0][1])
+        self.relleno()
         
+    def relleno(self):
+        print(self.puntos)
         for j in self.puntos:
             mi = min(self.puntos.get(j))
             ma = max(self.puntos.get(j))
             for i in range(mi, ma):
                 self.point(i, j)
-
+        
     def glFinish(self, filename='out.bmp'):
         f = open(filename, 'bw')
 
@@ -208,9 +212,15 @@ class Render(object):
 
 
 bitmap = Render()
-bitmap.glCreateWindow(500, 500)
+bitmap.glCreateWindow(800, 800)
 bitmap.glClearColor(0.45, 0.06, 0.87)
 bitmap.glColor(0.2, 0.70, 0.36)
+vertex = [(321, 335), (288, 286), (339, 251), (374, 302)]
+vertex = [(377, 249), (411, 197), (436, 249)]
+vertex = [(413, 177), (448, 159), (502, 88), (553, 53), (535, 36), (676, 37), (660, 52),
+(750, 145), (761, 179), (672, 192), (659, 214), (615, 214), (632, 230), (580, 230),
+(597, 215), (552, 214), (517, 144), (466, 180)]
+vertex = [(682, 175), (708, 120), (735, 148), (739, 170)]
 vertex = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330), (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
 bitmap.prueba(vertex)
 bitmap.glFinish()
