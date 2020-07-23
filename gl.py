@@ -1,252 +1,103 @@
 '''
     Diana Ximena de León Figueroa
     Carne 18607
-    Lab1
+    Lab 1 Filling any polygon
     Graficas por Computadora
     21 de julio de 2020
 '''
 
-import struct
-
-
-def char(c):
-    return struct.pack('=c', c.encode('ascii'))
-
-
-def word(c):
-    return struct.pack('=h', c)
-
-
-def dword(c):
-    return struct.pack('=l', c)
-
-
-def color(r, g, b):
-    return bytes([b, g, r])
-
-
-class Render(object):
-    def __init__(self):
-        self.framebuffer = []
-        self.puntos = {}
-
-    def point(self, x, y):
-        self.framebuffer[y][x] = self.color
-
-    def glInit(self):
-        pass
-
-    def glCreateWindow(self, width, height):
-        self.width = width
-        self.height = height
-
-    def glViewport(self, x, y, width, height):
-        self.xViewPort = x
-        self.yViewPort = y
-        self.viewPortWidth = width
-        self.viewPortHeight = height
-
-    def glClear(self):
-        self.framebuffer = [
-            [color(0, 0, 0) for x in range(self.width)]
-            for y in range(self.height)
-        ]
-
-    def glClearColor(self, r=1, g=1, b=1):
-        r = round(r*255)
-        g = round(g*255)
-        b = round(b*255)
-
-        self.framebuffer = [
-            [color(r, g, b) for x in range(self.width)]
-            for y in range(self.height)
-        ]
-
-    def glColor(self, r=0.5, g=0.5, b=0.5):
-        r = round(r*255)
-        g = round(g*255)
-        b = round(b*255)
-        self.color = color(r, g, b)
-
-    def glCordX(self, x):
-        return round((x+1)*(self.viewPortWidth/2)+self.xViewPort)
-
-    def glCordY(self, y):
-        return round((y+1)*(self.viewPortHeight/2)+self.yViewPort)
-
-    def glVertex(self, x, y):
-        X = self.glCordX(x)
-        Y = self.glCordY(y)
-        self.point(X, Y)
-
-    def glPoint(self, x, y):
-        X = self.glCordX(x)
-        Y = self.glCordY(y)
-        self.point(X, Y)
-
-    def glLine(self, x0, y0, x1, y1):
-        '''
-        x0 = self.glCordX(x0)
-        y0 = self.glCordY(y0)
-        x1 = self.glCordX(x1)
-        y1 = self.glCordY(y1)
-        '''
-        dy = abs(y1 - y0)
-        dx = abs(x1 - x0)
-
-        steep = dy > dx
-
-        if steep:
-            x0, y0 = y0, x0
-            x1, y1 = y1, x1
-
-        if x0 > x1:
-            x0, x1 = x1, x0
-            y0, y1 = y1, y0
-
-        dy = abs(y1 - y0)
-        dx = abs(x1 - x0)
-
-        offset = 0
-        threshold = dx
-        y = y0
-        inc = 1 if y1 > y0 else -1
-        for x in range(x0, x1):
-            if steep:
-                self.point(y, x)
-            else:
-                self.point(x, y)
-
-            offset += 2 * dy
-            if offset >= threshold:
-                y += inc
-                threshold += 2 * dx
-
-    def line(self, x0, y0, x1, y1):
-        dy = abs(y1 - y0)
-        dx = abs(x1 - x0)
-
-        steep = dy > dx
-
-        if steep:
-            x0, y0 = y0, x0
-            x1, y1 = y1, x1
-
-        if x0 > x1:
-            x0, x1 = x1, x0
-            y0, y1 = y1, y0
-
-        dy = abs(y1 - y0)
-        dx = abs(x1 - x0)
-
-        offset = 0
-        threshold = dx
-        y = y0
-        inc = 1 if y1 > y0 else -1
-        for x in range(x0, x1):
-            if steep:
-                self.point(y, x)
-                if self.puntos.get(x) == None:
-                    self.puntos[x] = []
-                
-                self.puntos[x] += [y]
-            else:
-                self.point(x, y)
-                if self.puntos.get(y) == None:
-                    self.puntos[y] = []
-                
-                self.puntos[y] += [x]
-
-
-            offset += 2 * dy
-            if offset >= threshold:
-                y += inc
-                threshold += 2 * dx
-
-
-    def prueba(self, vertex):
-        self.puntos = {}
-        i = 0
-        while i <= (len(vertex) - 2):
-            self.line(vertex[i][0], vertex[i][1], vertex[i+1][0], vertex[i+1][1])
-            i += 1
-        self.line(vertex[i][0], vertex[i][1], vertex[0][0], vertex[0][1])
-        self.relleno()
-        
-    def relleno(self):
-        for j in self.puntos:
-            l = self.puntos.get(j)
-            mi = min(l)
-            ma = max(l)
-            if len(l) > 3:
-                pin = True
-                for r in range(0, (len(l)-2)):
-                    if (l[r]+1) != l[r + 1]:
-                        pin = False
-                        m1 = l[r]
-                        m2 = l[r+1]
-                        if m1 != mi and m2 != ma:
-                            for i in range(mi, m1):
-                                self.point(i, j)
-                            for i in range(m2, ma):
-                                self.point(i, j)
-                if pin:
-                    for i in range(mi, ma):
-                        self.point(i, j)  
-            else:
-                for i in range(mi, ma):
-                    self.point(i, j)
-            
-        
-    def glFinish(self, filename='out.bmp'):
-        f = open(filename, 'bw')
-
-        f.write(char('B'))
-        f.write(char('M'))
-        f.write(dword(14 + 40 + self.width * self.height * 3))
-        f.write(dword(0))
-        f.write(dword(14 + 40))
-
-        # image header
-        f.write(dword(40))
-        f.write(dword(self.width))
-        f.write(dword(self.height))
-        f.write(word(1))
-        f.write(word(24))
-        f.write(dword(0))
-        f.write(dword(self.width * self.height * 3))
-        f.write(dword(0))
-        f.write(dword(0))
-        f.write(dword(0))
-        f.write(dword(0))
-
-        # pixel data
-        for x in range(self.width):
-            for y in range(self.height):
-                f.write(self.framebuffer[y][x])
-
-        f.close()
-
+from lib import Render
 
 bitmap = Render()
-bitmap.glCreateWindow(800, 800)
-bitmap.glClearColor(0.45, 0.06, 0.87)
-bitmap.glColor(0.2, 0.70, 0.36)
-vertex = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330), (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
-bitmap.prueba(vertex)
-bitmap.glColor(0.75, 0.75, 0.75)
-vertex = [(321, 335), (288, 286), (339, 251), (374, 302)]
-bitmap.prueba(vertex)
-bitmap.glColor(0.2, 0.2, 0.2)
-vertex = [(377, 249), (411, 197), (436, 249)]
-bitmap.prueba(vertex)
-bitmap.glColor(0.9, 0.9, 0.9)
-vertex = [(413, 177), (448, 159), (502, 88), (553, 53), (535, 36), (676, 37), (660, 52),
-(750, 145), (761, 179), (672, 192), (659, 214), (615, 214), (632, 230), (580, 230),
-(597, 215), (552, 214), (517, 144), (466, 180)]
-bitmap.prueba(vertex)
-bitmap.glColor(0.5, 0.5, 0.5)
-# Sumar 100 porque quedaba debajo de otra figura
-vertex = [(682, 175+100), (708, 120+100), (735, 148+100), (739, 170+100)]
-bitmap.prueba(vertex)
-bitmap.glFinish()
+
+
+def glInit(self):
+    pass
+
+
+def glCreateWindow(width, height):
+    bitmap.createWindow(width, height)
+
+
+def glViewport(x, y, width, height):
+    bitmap.viewport(x, y, width, height)
+
+
+def glClear():
+    bitmap.clear()
+
+
+def glClearColor(r, g, b):
+    r = round(r * 255)
+    g = round(g * 255)
+    b = round(b * 255)
+    bitmap.clearColor(r, g, b)
+
+
+def glColor(r, g, b):
+    r = round(r * 255)
+    g = round(g * 255)
+    b = round(b * 255)
+    bitmap.setColor(r, g, b)
+
+
+def glVertex(x, y):
+    X = bitmap.getCordX(x)
+    Y = bitmap.getCordY(y)
+    bitmap.vertex(X, Y)
+
+
+def glPoint(x, y):
+    X = bitmap.getCordX(x)
+    Y = bitmap.getCordY(y)
+    bitmap.point(X, Y)
+
+
+def glLine(x0, y0, x1, y1):
+    x0 = bitmap.getCordX(x0)
+    y0 = bitmap.getCordY(y0)
+    x1 = bitmap.getCordX(x1)
+    y1 = bitmap.getCordY(y1)
+    bitmap.line(x0, y0, x1, y1)
+
+
+def glDraw(cord):
+    bitmap.draw(cord)
+
+
+def glFinish(filename='out.bmp'):
+    bitmap.write(filename)
+
+
+glCreateWindow(800, 800)
+glClearColor(0.45, 0.06, 0.87)
+
+# Poligono 1
+glColor(0.2, 0.70, 0.36)
+cord = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330),
+        (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
+glDraw(cord)
+
+# Poligono 2
+glColor(0.75, 0.75, 0.75)
+cord = [(321, 335), (288, 286), (339, 251), (374, 302)]
+glDraw(cord)
+
+# Poligono 3
+glColor(0.2, 0.2, 0.2)
+cord = [(377, 249), (411, 197), (436, 249)]
+glDraw(cord)
+
+# Poligono 4
+glColor(0.9, 0.9, 0.9)
+cord = [(413, 177), (448, 159), (502, 88), (553, 53), (535, 36), (676, 37), (660, 52), (750, 145), (761, 179),
+        (672, 192), (659, 214), (615, 214), (632, 230), (580, 230), (597, 215), (552, 214), (517, 144), (466, 180)]
+glDraw(cord)
+
+# Poligono 5
+glColor(0.5, 0.5, 0.5)
+''' Sumar 100 porque quedaba debajo de otra figura '''
+cord = [(682, 175 + 100), (708, 120 + 100), (735, 148 + 100), (739, 170 + 100)]
+glDraw(cord)
+
+glFinish()
