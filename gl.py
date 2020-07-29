@@ -95,9 +95,8 @@ cord = [(413, 177), (448, 159), (502, 88), (553, 53), (535, 36), (676, 37), (660
 glDraw(cord)
 
 # Poligono 5
-glColor(0.5, 0.5, 0.5)
-''' Sumar 100 porque quedaba debajo de otra figura '''
-cord = [(682, 175 + 100), (708, 120 + 100), (735, 148 + 100), (739, 170 + 100)]
+glColor(0.45, 0.06, 0.87)
+cord = [(682, 175), (708, 120), (735, 148), (739, 170)]
 glDraw(cord)
 
 glFinish()
